@@ -162,15 +162,10 @@ class BrnoSGE(EngineBase):
             return
 
         call_prefix = [
-            'source ~/.bashrc;',
             'cd {};'.format(os.getcwd()),
             'unset PYTHONHOME;',
-            "[[ $- == *i* ]] && echo 'Interactive' || echo 'Not interactive';",
-            "shopt -q login_shell && echo 'Login shell' || echo 'Not login shell';",
             'export PYTHONPATH={}:$PYTHONPATH;'.format(os.getcwd()),
             'source activate the-env;',
-            'ulimit -a;',
-            'which python;',
         ]
 
         submitted = []
