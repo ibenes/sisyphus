@@ -165,7 +165,7 @@ class BrnoSGE(EngineBase):
             'cd {};'.format(os.getcwd()),
             'unset PYTHONHOME;',
             'export PYTHONPATH={}:$PYTHONPATH;'.format(os.getcwd()),
-            'source activate the-env;',
+            'source {} {};'.format(gs.ACTIVATE, gs.CONDA_ENV),
         ]
 
         submitted = []
