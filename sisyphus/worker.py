@@ -122,7 +122,6 @@ class LoggingThread(Thread):
             # update log file:
             # at least every PLOGGING_UPDATE_FILE_PERIOD seconds or
             # if rss usage grow relative more then PLOGGING_MIN_CHANGE
-            # if (max_resources['rss'] > last_log_value and time.time() - last_log_time > 30) or \
             if time.time() - last_log_time > gs.PLOGGING_UPDATE_FILE_PERIOD or\
                     (max_resources['rss'] - last_log_value)/last_log_value > gs.PLOGGING_MIN_CHANGE:
                 log_usage(resources)
