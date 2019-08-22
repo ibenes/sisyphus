@@ -136,10 +136,14 @@ class BrnoSGE(EngineBase):
         # Try to convert time to float, calculate minutes from it
         # and convert it back to an rounded string
         # If it fails use string directly
-        task_time = try_to_multiply(rqmt['time'], 60 * 60)  # convert to seconds if possible
+        if rqmt['time'] > 3.0:
+            out.extend(['-q', 'long.q'])
+        else:
+            out.extend(['-q', 'all.q'])
 
-        out.append('-l')
-        out.append('h_rt=%s' % task_time)
+        # task_time = try_to_multiply(rqmt['time'], 60 * 60)  # convert to seconds if possible
+        # out.append('-l')
+        # out.append('h_rt=%s' % task_time)
 
         qsub_args = rqmt.get('qsub_args', [])
         if isinstance(qsub_args, str):
@@ -223,7 +227,6 @@ class BrnoSGE(EngineBase):
 
         qsub_call += ['-t', '%i-%i:%i' % (start_id, end_id, step_size)]
         command = ' '.join(call) + '\n'
-        print("[debug]:", qsub_call, command)
         try:
             out, err, retval = self.system_call(qsub_call, command)
         except subprocess.TimeoutExpired:
