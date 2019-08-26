@@ -240,6 +240,20 @@ class Manager(threading.Thread):
         self.clear_once = False
         return False
 
+    def clear_interrupted(self):
+        # List errors
+        if (gs.CLEAR_ERROR or self.clear_once) and gs.STATE_INTERRUPTED in self.jobs:
+            job_cleared = False
+            for job in self.jobs[gs.STATE_INTERRUPTED]:
+                logging.warning('Clearing: %s' % job)
+                job._sis_move()
+                job_cleared = True
+            self.update_jobs()
+            if job_cleared:
+                return True
+        self.clear_once = False
+        return False
+
     def update_state_overview(self):
         self.state_overview = []
         for state, job_set in self.jobs.items():
@@ -468,6 +482,19 @@ class Manager(threading.Thread):
                 if answer.lower() == 'y':
                     self.clear_once = True
                     self.clear_errors()
+                    self.print_state_overview(verbose=False)
+                answer = None
+
+        if gs.STATE_INTERRUPTED in self.jobs:
+            if self.clear_once:
+                self.clear_interrupted()
+            elif self.ignore_once:
+                pass
+            else:
+                answer = self.input('Clear jobs in interrupted state? [y/N] ')
+                if answer.lower() == 'y':
+                    self.clear_once = True
+                    self.clear_interrupted()
                     self.print_state_overview(verbose=False)
                 answer = None
 
