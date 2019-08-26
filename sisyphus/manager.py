@@ -3,7 +3,6 @@ import os
 import sys
 import time
 import threading
-import tracemalloc
 
 from multiprocessing.pool import ThreadPool
 
@@ -373,8 +372,6 @@ class Manager(threading.Thread):
             ret = input(prompt)
         return ret
 
-
-
     def resume_jobs(self):
         # function to resume jobs:
         def f(job):
@@ -460,7 +457,7 @@ class Manager(threading.Thread):
         # Skip first part if there is nothing todo
         if not self.jobs:
             answer = self.input('All calculations are done, print verbose overview (v), update outputs and alias (u), '
-                           'cancel (c)? ')
+                                'cancel (c)? ')
             if answer.lower() in ('y', 'v'):
                 self.print_state_overview(verbose=True)
             elif answer.lower() in ('u'):
@@ -512,16 +509,16 @@ class Manager(threading.Thread):
                 self.check_output(write_output=self.link_outputs, update_all_outputs=True)
                 break
             elif answer.lower() == 'u':
-               self.link_outputs = True
-               create_aliases(self.sis_graph.jobs())
-               self.check_output(write_output=self.link_outputs, update_all_outputs=True)
+                self.link_outputs = True
+                create_aliases(self.sis_graph.jobs())
+                self.check_output(write_output=self.link_outputs, update_all_outputs=True)
             elif answer.lower() == 'n':
                 self.stop()
                 break
             else:
                 logging.warning('Unknown command: %s' % answer)
             answer = self.input('Print verbose overview (v), update aliases and outputs (u), '
-                           'start manager (y), or exit (n)? ')
+                                'start manager (y), or exit (n)? ')
 
         if not self._stop_loop:
             self.clear_errors()
@@ -534,7 +531,8 @@ class Manager(threading.Thread):
             # check if finished
             logging.debug('Begin of manager loop')
 
-            if self.mem_profile: self.mem_profile.snapshot()
+            if self.mem_profile:
+                self.mem_profile.snapshot()
             self.job_engine.reset_cache()
             self.check_output(write_output=self.link_outputs)
 
