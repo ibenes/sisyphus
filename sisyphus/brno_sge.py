@@ -127,8 +127,10 @@ class BrnoSGE(EngineBase):
         out.append('-l')
         out.append('mem_free=%s' % mem)
 
-        out.append('-l')
-        out.append('gpu=%s' % rqmt.get('gpu', 0))
+        gpu_rqmt = rqmt.get('gpu', 0)
+        if gpu_rqmt > 0:
+            out.append('-l')
+            out.append('gpu=%s' % gpu_rqmt)
 
         # out.append('-l')
         # out.append('num_proc=%s' % rqmt.get('cpu', 1))
@@ -136,10 +138,19 @@ class BrnoSGE(EngineBase):
         # Try to convert time to float, calculate minutes from it
         # and convert it back to an rounded string
         # If it fails use string directly
-        if rqmt['time'] > 3.0:
-            out.extend(['-q', 'long.q'])
+        time_rqmt = rqmt['time']
+
+        if time_rqmt > 3.0:
+            queue_name = 'long.q'
         else:
-            out.extend(['-q', 'all.q'])
+            queue_name = 'all.q'
+
+        if gpu_rqmt > 0:
+            hosts = '@gpu'
+        else:
+            hosts = '@stable'
+
+        out.extend(['-q', '{}@{}'.format(queue_name, hosts)])
 
         # task_time = try_to_multiply(rqmt['time'], 60 * 60)  # convert to seconds if possible
         # out.append('-l')
@@ -167,6 +178,7 @@ class BrnoSGE(EngineBase):
             return
 
         call_prefix = [
+            'ulimit -a;',
             'cd {};'.format(os.getcwd()),
             'unset PYTHONHOME;',
             'export PYTHONPATH={}:$PYTHONPATH;'.format(os.getcwd()),
