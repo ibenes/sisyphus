@@ -40,6 +40,38 @@ def try_to_multiply(y, x, backup_value=None):
             return backup_value
 
 
+class DiskResources:
+    def __init__(self,
+                 matylda1=0, matylda2=0, matylda3=0, matylda4=0, matylda5=0, matylda6=0,
+                 scratch1=0, scratch2=0, scratch3=0, scratch4=0, scratch5=0, scratch6=0):
+        self.resources = {
+            'matylda1': matylda1,
+            'matylda2': matylda2,
+            'matylda3': matylda3,
+            'matylda4': matylda4,
+            'matylda5': matylda5,
+            'matylda6': matylda6,
+            'scratch1': scratch1,
+            'scratch2': scratch2,
+            'scratch3': scratch3,
+            'scratch4': scratch4,
+            'scratch5': scratch5,
+            'scratch6': scratch6,
+        }
+
+        for name, res in self.resources.items():
+            if res < 0.0 or res > 100.0:
+                raise ValueError("{} has illegal value {}".format(name, res))
+
+    def to_qsub_args(self):
+        args = []
+        for name, res in self.resources.items():
+            if res > 0.0:
+                args.extend(['-l', '{}={}'.format(name, res)])
+
+        return args
+
+
 class BrnoSGE(EngineBase):
 
     def __init__(self, default_rqmt, gateway=None, auto_clean_eqw=True, ignore_jobs=[]):
@@ -156,6 +188,9 @@ class BrnoSGE(EngineBase):
         # out.append('-l')
         # out.append('h_rt=%s' % task_time)
 
+        disks = rqmt.get('disks', [])
+        out.extend(disks)
+
         qsub_args = rqmt.get('qsub_args', [])
         if isinstance(qsub_args, str):
             qsub_args = qsub_args.split()
@@ -179,6 +214,7 @@ class BrnoSGE(EngineBase):
 
         call_prefix = [
             'ulimit -a;',
+            'echo "{}";'.format(self.options(rqmt)),
             'cd {};'.format(os.getcwd()),
             'unset PYTHONHOME;',
             'export PYTHONPATH={}:$PYTHONPATH;'.format(os.getcwd()),
