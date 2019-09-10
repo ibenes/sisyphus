@@ -188,8 +188,8 @@ class BrnoSGE(EngineBase):
         # out.append('-l')
         # out.append('h_rt=%s' % task_time)
 
-        disks = rqmt.get('disks', [])
-        out.extend(disks)
+        disks = rqmt.get('disks', DiskResources())
+        out.extend(disks.to_qsub_args())
 
         qsub_args = rqmt.get('qsub_args', [])
         if isinstance(qsub_args, str):
