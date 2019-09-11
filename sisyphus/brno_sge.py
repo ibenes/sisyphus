@@ -63,6 +63,17 @@ class DiskResources:
             if res < 0.0 or res > 100.0:
                 raise ValueError("{} has illegal value {}".format(name, res))
 
+    def __str__(self):
+        return repr(self)
+
+    def __repr__(self):
+        args = []
+        for name, res in self.resources.items():
+            if res > 0.0:
+                args.append('{}={}'.format(name, res))
+
+        return "'DiskResources({})'".format(', '.join(args))
+
     def to_qsub_args(self):
         args = []
         for name, res in self.resources.items():
