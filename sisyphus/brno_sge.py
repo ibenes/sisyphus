@@ -189,11 +189,12 @@ class BrnoSGE(EngineBase):
             queue_name = 'all.q'
 
         if gpu_rqmt > 0:
-            hosts = '@gpu'
+            host_groups = ['@gpu', '@speech-gpu']
         else:
-            hosts = '@stable'
+            host_groups = ['@stable']
 
-        out.extend(['-q', '{}@{}'.format(queue_name, hosts)])
+        queue_names = ['{}@{}'.format(queue_name, host_group) for host_group in host_groups]
+        out.extend(['-q', ','.join(queue_names)])
 
         # task_time = try_to_multiply(rqmt['time'], 60 * 60)  # convert to seconds if possible
         # out.append('-l')
